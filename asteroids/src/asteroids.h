@@ -10,3 +10,9 @@ extern struct rock *asteroids; /* array of rocks / pointer to linked-list */
 extern struct missile *shots;  /* array of missiles / pointer to linked-list */
 
 extern const float Dt; /* Time step for physics, needed for consistent motion */
+
+extern bool	gameStart;
+
+extern bool inPlay;
+
+void resetGame(void);

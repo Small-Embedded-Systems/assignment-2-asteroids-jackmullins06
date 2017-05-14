@@ -28,43 +28,53 @@ struct ship player;
 
 float Dt = 0.01f;
 
-Ticker model, view, controller;
+bool gameStart = false;
+bool inPlay = false;
 
+Ticker model, view, controller, rocks;
+
+void timerHandler();
 bool paused = true;
+
 /* The single user button needs to have the PullUp resistor enabled */
 DigitalIn userbutton(P2_10,PullUp);
-int main()
-{
 
-    init_DBuffer();
-    
+/* Set game variables back to default */
+void resetGame(void) {
+	lives = 5;
+	player.shield = 3;
+	score = 0;
 
-    view.attach( draw, 0.025);
-    model.attach( physics, Dt);
-    controller.attach( controls, 0.1);
-    
-    lives = 5;
-    
-    /* Pause to start */
-    while( userbutton.read() ){ /* remember 1 is not pressed */
-        paused=true;
-        wait_ms(100);
-    }
-    paused = false;
-    
-    while(true) {
-        /* do one of */
-        /* Wait until all lives have been used
-        while(lives>0){
-            // possibly do something game related here
-            wait_ms(200);
-        }
-        */
-        /* Wait until each life is lost
-        while( inPlay ){
-            // possibly do something game related here
-            wait_ms(200);
-        }
-        */
-    }
+	player.x = 230;
+	player.y = 120;
 }
+
+int main() {
+	init_DBuffer();
+	
+	intialiseAsteroidHeap();
+	intialiseMissileHeap();
+
+    view.attach(draw, 0.025);
+    model.attach(physics, Dt);
+    controller.attach(controls, 0.1);
+    rocks.attach(spawnAsteroid, 0.1);
+    
+  	lives = 5;
+    
+    while(userbutton.read()){ /* remember 1 is not pressed */
+		paused=true;
+    	wait_ms(100);
+  	} paused = false;
+    
+	while(true) {
+		if(gameStart == true && lives == 0) {
+			view.detach();
+			model.detach();
+			controller.detach();
+			rocks.detach();
+			drawEndScreen();
+			wait_ms(300);
+		}
+	}
+}	
